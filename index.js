@@ -11,7 +11,6 @@ app.use(cors());
 app.use(express.json());
 
 // DB URI
-console.log(process.env.DB_PASS);
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.o2yungw.mongodb.net/handyMate?retryWrites=true&w=majority`;
 
@@ -26,6 +25,7 @@ const client = new MongoClient(uri, {
 
 // connect collection
 const serviceCollection = client.db("handyMate").collection("services");
+const bookingCollection = client.db("handyMate").collection("bookings");
 
 async function run() {
   try {
@@ -37,14 +37,20 @@ async function run() {
       const result = await cursor.toArray();
       res.send(result);
     });
-    app.get('/api/services/:serviceId', async( req, res) => {
+    app.get("/api/services/:serviceId", async (req, res) => {
       const id = req.params.serviceId;
       // console.log(id);
       const query = { _id: new ObjectId(id) };
       const service = await serviceCollection.findOne(query);
       // console.log(service);
       res.send(service);
-    })
+    });
+
+    app.post("/api/bookings", async (req, res) => {
+      const booking = req.body;
+      const result = await bookingCollection.insertOne(booking);
+      res.send(result);
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
