@@ -52,8 +52,21 @@ async function run() {
 
     app.post("/api/bookings", async (req, res) => {
       const booking = req.body;
-      const result = await bookingCollection.insertOne(booking);
-      res.send(result);
+      try {
+        const result = await bookingCollection.insertOne(booking);
+        res.send(result);
+      } catch (error) {
+        if (error.message.includes("E11000")) {
+          res
+            .status(400)
+            .json({ error: "You have already booked this service." });
+        } else {
+          console.error("An error occurred:", error);
+          res.status(500).json({
+            error: "An error occurred while processing your request.",
+          });
+        }
+      }
     });
 
     // Send a ping to confirm a successful connection
