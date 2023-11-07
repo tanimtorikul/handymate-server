@@ -31,6 +31,10 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
+    await bookingCollection.createIndex(
+      { userEmail: 1, service_id: 1 },
+      { unique: true }
+    );
 
     app.get("/api/services", async (req, res) => {
       const cursor = serviceCollection.find();
