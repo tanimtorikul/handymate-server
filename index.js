@@ -49,6 +49,11 @@ async function run() {
       // console.log(service);
       res.send(service);
     });
+    app.post("/api/services", async (req, res) => {
+      const service = req.body;
+      const result = await serviceCollection.insertOne(service);
+      res.send(result);
+    });
 
     app.post("/api/bookings", async (req, res) => {
       const booking = req.body;
