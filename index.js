@@ -30,7 +30,7 @@ const bookingCollection = client.db("handyMate").collection("bookings");
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
     await bookingCollection.createIndex(
       { userEmail: 1, service_id: 1 },
       { unique: true }
@@ -53,6 +53,13 @@ async function run() {
       const service = req.body;
       const result = await serviceCollection.insertOne(service);
       res.send(result);
+    });
+
+    app.get("/api/services/provider/:email", async (req, res) => {
+      const providerEmail = req.params.email;
+      const query = { providerEmail: providerEmail };
+      const userServices = await serviceCollection.find(query).toArray();
+      res.send(userServices);
     });
 
     app.post("/api/bookings", async (req, res) => {
