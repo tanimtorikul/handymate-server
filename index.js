@@ -96,18 +96,27 @@ async function run() {
           providerDesc: updatedService?.providerDesc,
         },
       };
-      const result = await serviceCollection.updateOne(filter, service, options);
+      const result = await serviceCollection.updateOne(
+        filter,
+        service,
+        options
+      );
       res.send(result);
     });
-    
+
     app.delete("/api/services/:serviceId", async (req, res) => {
       const id = req.params.serviceId;
       const query = { _id: new ObjectId(id) };
       const result = await serviceCollection.deleteOne(query);
       res.send(result);
     });
-    
-    
+
+    app.get("/api/bookings/:userEmail", async (req, res) => {
+      const userEmail = req.params.userEmail;
+      const query = { userEmail: userEmail };
+      const userBookings = await bookingCollection.find(query).toArray();
+      res.send(userBookings);
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
