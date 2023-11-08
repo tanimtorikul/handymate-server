@@ -3,12 +3,12 @@ const cors = require("cors");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 const app = express();
-const port = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5000;
 
 // middlewares
 
 app.use(cors());
-app.use(express.json());
+// app.use(express.json());
 
 // DB URI
 
@@ -81,6 +81,34 @@ async function run() {
       }
     });
 
+    app.put("/api/services/:serviceId", async (req, res) => {
+      const id = req.params.serviceId;
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updatedService = req.body;
+      const service = {
+        $set: {
+          serviceImage: updatedService?.serviceImage,
+          serviceArea: updatedService?.serviceArea,
+          serviceName: updatedService?.serviceName,
+          price: updatedService?.price,
+          description: updatedService?.description,
+          providerDesc: updatedService?.providerDesc,
+        },
+      };
+      const result = await serviceCollection.updateOne(filter, service, options);
+      res.send(result);
+    });
+    
+    app.delete("/api/services/:serviceId", async (req, res) => {
+      const id = req.params.serviceId;
+      const query = { _id: new ObjectId(id) };
+      const result = await serviceCollection.deleteOne(query);
+      res.send(result);
+    });
+    
+    
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
@@ -97,6 +125,6 @@ app.get("/", (req, res) => {
   res.send("Handymate is running");
 });
 
-app.listen(port, () => {
-  console.log(`Handymate app listening on port ${port}`);
+app.listen(PORT, () => {
+  console.log(`Handymate app listening on port ${PORT}`);
 });
